@@ -77,6 +77,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [filter, setFilter] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
 
   useEffect(() => { document.documentElement.dataset.theme = theme }, [theme])
   useEffect(() => {
@@ -91,6 +92,35 @@ function App() {
   const navItems = [['about', 'About'], ['skills', 'Skills'], ['experience', 'Experience'], ['projects', 'Projects'], ['research', 'Research'], ['certifications', 'Certifications'], ['contact', 'Contact']]
   const closeMenu = () => setMenuOpen(false)
   const featured = featuredProjectIds.slice(0, 3).map(projectId => projects.find(project => project.id === projectId))
+
+  const handleFieldChange = event => {
+    const { name, value } = event.target
+    setFormData(current => ({ ...current, [name]: value }))
+  }
+
+  const handleContactSubmit = event => {
+    event.preventDefault()
+
+    const subject = formData.subject || 'Portfolio inquiry'
+    const body = [
+      `Name: ${formData.name || 'Not provided'}`,
+      `Email: ${formData.email || 'Not provided'}`,
+      '',
+      'Message:',
+      formData.message || 'No message provided.'
+    ].join('\n')
+
+    const mailtoLink = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailAddress)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+
+    const fallbackWindow = window.open(gmailLink, '_blank', 'noopener,noreferrer')
+    if (fallbackWindow) {
+      fallbackWindow.opener = null
+    }
+
+    window.location.href = mailtoLink
+    setFormData({ name: '', email: '', subject: '', message: '' })
+  }
 
   return <>
     <nav className="nav"><div className="nav-inner"><a href="#home" className="brand"><span className="brand-mark">MI</span><span>Muhammad Idrees</span></a><div className="nav-links">{navItems.map(item => <a href={`#${item[0]}`} key={item[0]}>{item[1]}</a>)}</div><div className="nav-actions"><a className="icon-btn" href="https://github.com/Muhammad-idrees05" target="_blank" rel="noreferrer" aria-label="GitHub">GH</a><a className="icon-btn" href="https://linkedin.com/in/muhammad-idreesa356822a" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a><a href="#contact" className="btn btn-primary nav-cta">Let's Work Together</a><button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open menu">☰</button></div></div></nav>
@@ -115,7 +145,29 @@ function App() {
 
       <section className="section credentials-section" id="certifications"><div className="container credentials-grid"><div className="credential-block reveal"><div className="eyebrow">08 / EDUCATION</div><h2>Foundation</h2><div className="education-card"><span>BACHELOR OF SCIENCE</span><h3>Artificial Intelligence</h3><p>University of Agriculture, Peshawar</p><strong>3.40 <small>/ 4.00 CGPA</small></strong></div></div><div className="credential-block reveal"><div className="eyebrow">09 / CERTIFICATIONS</div><h2>Continuous learning.</h2><div className="cert-list">{[['Agentic AI', 'Edureka'], ['The Art of Prompt Engineering', 'IBM'], ['Prompt Engineering', 'Vanderbilt University'], ['Machine Learning, AI & Data Science', 'E-Hunar'], ['Feature Engineering for Machine Learning', 'Udemy']].map((cert, index) => <div key={cert[0]}><span>0{index + 1}</span><strong>{cert[0]}</strong><small>{cert[1]}</small></div>)}</div></div></div></section>
 
-      <section className="section contact-section" id="contact"><div className="container contact-panel reveal"><div className="eyebrow">10 / CONTACT</div><h2>Have an AI idea?<br/><span>Let's build it.</span></h2><p>Whether it is a machine-learning model, computer-vision system, RAG application, AI agent, or automation workflow, let's talk.</p><div className="hero-actions"><a href={emailLink} className="btn btn-primary" onClick={handleEmailClick}>Let's Talk ↗</a><a href="https://wa.me/923460972648" target="_blank" rel="noreferrer" className="btn btn-quiet">WhatsApp</a><a href="https://github.com/Muhammad-idrees05" target="_blank" rel="noreferrer" className="btn btn-quiet">View GitHub ↗</a><a href="https://linkedin.com/in/muhammad-idreesa356822a" target="_blank" rel="noreferrer" className="btn btn-quiet">LinkedIn ↗</a></div></div></section>
+      <section className="section contact-section" id="contact"><div className="container contact-panel reveal"><div className="eyebrow">10 / CONTACT</div><h2>Have an AI idea?<br/><span>Let's build it.</span></h2><p>Whether it is a machine-learning model, computer-vision system, RAG application, AI agent, or automation workflow, let's talk.</p>
+        <form className="contact-form" onSubmit={handleContactSubmit}>
+          <div className="form-grid">
+            <label>
+              <span>Your Name</span>
+              <input type="text" name="name" value={formData.name} onChange={handleFieldChange} placeholder="Your name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" value={formData.email} onChange={handleFieldChange} placeholder="you@example.com" required />
+            </label>
+          </div>
+          <label>
+            <span>Subject</span>
+            <input type="text" name="subject" value={formData.subject} onChange={handleFieldChange} placeholder="Project collaboration / AI solution" required />
+          </label>
+          <label>
+            <span>Message</span>
+            <textarea name="message" value={formData.message} onChange={handleFieldChange} rows="5" placeholder="Tell me about your project, goals, and timeline..." required />
+          </label>
+          <button type="submit" className="btn btn-primary submit-btn">Send Message ↗</button>
+        </form>
+        <div className="hero-actions secondary-actions"><a href="https://wa.me/923460972648" target="_blank" rel="noreferrer" className="btn btn-quiet">WhatsApp</a><a href="https://github.com/Muhammad-idrees05" target="_blank" rel="noreferrer" className="btn btn-quiet">View GitHub ↗</a><a href="https://linkedin.com/in/muhammad-idreesa356822a" target="_blank" rel="noreferrer" className="btn btn-quiet">LinkedIn ↗</a></div></div></section>
     </main>
 
     <footer><div className="container footer-inner"><div><div className="brand"><span className="brand-mark">MI</span><span>Muhammad Idrees</span></div><p>AI Engineer | Machine Learning | Computer Vision | Generative AI</p></div><div className="footer-links"><a href="https://github.com/Muhammad-idrees05">GitHub</a><a href="https://linkedin.com/in/muhammad-idreesa356822a">LinkedIn</a><a href={emailLink} onClick={handleEmailClick}>Email</a></div><small>© 2026 Muhammad Idrees</small></div></footer>
